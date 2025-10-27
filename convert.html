@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Google JSON → Render 轉換器（含格式檢查）</title>
+<style>
+  body {
+    font-family: "Noto Sans TC", "Segoe UI", sans-serif;
+    background: #f9fafb;
+    margin: 0;
+    padding: 2rem;
+    color: #333;
+  }
+  h1 {
+    color: #2563eb;
+  }
+  textarea {
+    width: 100%;
+    height: 180px;
+    font-family: monospace;
+    font-size: 14px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    resize: vertical;
+  }
+  button {
+    background: #2563eb;
+    color: white;
+    border: none;
+    padding: 10px 16px;
+    border-radius: 8px;
+    font-size: 15px;
+    cursor: pointer;
+    margin-right: 10px;
+    margin-top: 10px;
+  }
+  button:hover {
+    background: #1e40af;
+  }
+  #output {
+    margin-top: 1.5rem;
+    background: #fff;
+    border: 1px solid #ccc;
+    padding: 10px;
+    border-radius: 8px;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    font-family: monospace;
+  }
+  .error {
+    color: #dc2626;
+    margin-top: 10px;
+  }
+  .success {
+    color: #16a34a;
+    margin-top: 10px;
+  }
+</style>
+</head>
+<body>
+  <h1>🔐 Google Credentials JSON → Render 環境變數轉換器</h1>
+  <p>請將你的 <code>credentials.json</code> 內容貼到下方，系統會自動檢查格式是否正確。</p>
+  
+  <textarea id="input" placeholder='貼上原始 JSON 檔案內容'></textarea>
+  <br>
+  <button onclick="convert()">🚀 驗證並轉換</button>
+  <button onclick="copyOutput()">📋 複製結果</button>
+
+  <div id="status"></div>
+  <div id="output" placeholder="轉換後結果會顯示在這裡"></div>
+
+<script>
+function convert() {
+  const input = document.getElementById("input").value.trim();
+  const status = document.getElementById("status");
+  const output = document.getElementById("output");
+  status.textContent = "";
+  output.textContent = "";
+
+  if (!input) {
+    status.innerHTML = "<p class='error'>⚠️ 請先貼上 JSON 檔案內容！</p>";
+    return;
+  }
+
+  try {
+    // 驗證 JSON 格式是否正確
+    JSON.parse(input);
+
+    // 轉義換行符號
+    const escaped = input.replace(/\n/g, "\\n");
+    output.textContent = escaped;
+    status.innerHTML = "<p class='success'>✅ JSON 格式正確！可安全用於 Render。</p>";
+  } catch (err) {
+    status.innerHTML = `<p class='error'>❌ JSON 格式錯誤：${err.message}</p>`;
+  }
+}
+
+function copyOutput() {
+  const output = document.getElementById("output").textContent;
+  if (!output) {
+    alert("尚未有轉換結果！");
+    return;
+  }
+  navigator.clipboard.writeText(output).then(() => {
+    alert("✅ 已複製到剪貼簿！");
+  });
+}
+</script>
+</body>
+</html>
